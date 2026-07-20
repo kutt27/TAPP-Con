@@ -1,6 +1,9 @@
 # TAPP-Con
 Constrained Tensor Multiplication Plugin
 
+> **Implementation note**:
+> Research idea was from senior from NVIDEA of constraining matrix multiplication using tensor network during a quantum discussion. The implementation was guided by me in phases with agents. No code was written by me in any sense. I will keep working on this repository to make it viable for production. The lack of GPU might trigger a gap in the testing, and will be mitigated soon. Detailed notes will be made in the upcoming days. 
+
 The simulation of strongly correlated quantum systems—such as conjugated polymers (e.g., trans-polyacetylene) and charge-transfer insulators—relies heavily on tensor network methods like Matrix Product States (MPS) and Matrix Product Operators (MPO) [1]. A critical bottleneck in these simulations is the exponential scaling of matrix dimensions during tensor contraction, specifically matrix multiplication [2]. This project proposes the development of an open-source plugin that implements constrained matrix multiplication for tensor networks, optimizing the contraction process by embedding discrete linear constraints directly into the tensor structure.
 
 In quantum chemistry and condensed matter physics, tensor networks represent complex many-body wavefunctions. The core operation in these methods is tensor contraction, which mathematically reduces to matrix multiplication [3]. As the system size or the required accuracy (bond dimension $\chi$) increases, the computational cost of these matrix multiplications grows exponentially [4].
