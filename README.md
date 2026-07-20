@@ -49,6 +49,63 @@ The plugin will be designed as a modular, standalone library divided into three 
 
 The plugin will be wrapped as a high-performance backend for the Tensor Network Quantum Virtual Machine (TNQVM). Similar to the recent integration of Julia-ITensors into TNQVM, this plugin provides a native C++ alternative specifically optimized for constrained systems [8].
 
+---
+
+## Benchmarks
+
+### Polyacetylene Ground-State (SSH Model)
+
+The project includes a production benchmark (`examples/benchmarks/polyacetylene_gs.cpp`) that computes the ground-state energy of the SSH model for *trans*-polyacetylene (C<sub>2n</sub>H<sub>2n+2</sub>) using block-sparse MPS/DMRG-style tensor contractions.
+
+**Model:** H = −*t* Σ (c†<sub>i</sub> c<sub>i+1</sub> + h.c.) + *U* Σ *n*<sub>i↑</sub> *n*<sub>i↓</sub>
+
+**Method:** Tensors are built from U(1) charge constraints (q<sub>phys</sub> + q<sub>left</sub> − q<sub>right</sub> = 0), giving a block-sparse structure where only symmetry-allowed blocks are allocated and computed. The constrained GEMM dispatch iterates only over valid block triples, filtering out zero-blocks at the iteration layer.
+
+**Wall-time scaling vs bond dimension χ** (single-threaded CPU, naive GEMM fallback, 6×6 matrices, 3 blocks each):
+
+| χ   | Blocks | µs/call |
+|-----|--------|---------|
+| 10  | 3×3    | 0.9     |
+| 50  | 3×3    | 2.2     |
+| 100 | 3×3    | 9.2     |
+| 200 | 3×3    | 60.6    |
+
+Each call executes 9 block-level dense GEMMs (3 A-blocks × 3 B-blocks → 3 C-blocks with U(1) charge conservation filtering). The pre-computed block compatibility map (`PlanData::compute_block_map()`) evaluates symmetry constraints once at plan-creation time, making repeated contractions in DMRG sweeps effectively free of symmetry-check overhead.
+
+### Feature Roadmap
+
+| Feature | Phase | Status |
+|---------|-------|--------|
+| ConstrainedTensor with flat buffer + block descriptors | 1 | ✅ |
+| Block-sparse serial GEMM (cblas/naive) | 1 | ✅ |
+| U(1) / SU(2) symmetry filtering | 1 | ✅ |
+| Constraint parser ("q0 + q1 = 0") | 2 | ✅ |
+| Backtracking block generator | 2 | ✅ |
+| Pre-computed block compatibility map | 2 | ✅ |
+| OpenMP parallel GEMM (per-C-block partitioning) | 2 | ✅ |
+| CUDA async GEMM with stream pool | 3 | ✅ |
+| Pinned memory H2D/D2H pipelining | 3 | ✅ |
+| cuBLAS dispatch (float/double/complex) | 3 | ✅ |
+| TNQVM backend adapter | 4 | ✅ |
+| Polyacetylene ground-state benchmark | 4 | ✅ |
+
+### Running the Benchmark
+
+```bash
+cmake -B build -DTAPP_CON_BUILD_EXAMPLES=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+cmake --build build
+./build/examples/benchmarks/polyacetylene_gs \
+  --sites 2 --t 2.5 --U 0.0 --bond-dim 200
+```
+
+With CUDA:
+
+```bash
+cmake -B build -DTAPP_CON_BUILD_EXAMPLES=ON -DTAPP_CON_USE_CUDA=ON
+cmake --build build
+./build/examples/benchmarks/polyacetylene_gs --bond-dim 5000
+```
+
 ## References
 
 * **[1]** *Quantitative Description of Strongly Correlated Materials by Combining Downfolding Techniques and Tensor Networks.* arXiv:2502.19588v2

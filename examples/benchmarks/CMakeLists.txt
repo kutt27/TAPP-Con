@@ -1,0 +1,2 @@
+add_executable(polyacetylene_gs polyacetylene_gs.cpp)
+target_link_libraries(polyacetylene_gs PRIVATE tapp_con)

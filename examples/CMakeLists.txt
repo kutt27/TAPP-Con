@@ -1,0 +1,2 @@
+add_subdirectory(tnqvm_adapter)
+add_subdirectory(benchmarks)
