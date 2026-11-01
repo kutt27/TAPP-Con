@@ -99,6 +99,13 @@ if(TAPP_CON_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
+# ── Reference tools ──
+# Parity dumper consumed by the Python port's test suite.
+if(TAPP_CON_BUILD_TESTS)
+    add_executable(dump_reference tools/dump_reference.cpp)
+    target_link_libraries(dump_reference PRIVATE tapp_con)
+endif()
+
 # ── Examples (Phase 4) ──
 if(TAPP_CON_BUILD_EXAMPLES)
     add_subdirectory(examples)

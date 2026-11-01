@@ -9,3 +9,8 @@ build/
 .DS_Store
 .cache/
 compile_commands.json
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.commandcode/

@@ -1,2 +1,5 @@
 add_executable(polyacetylene_gs polyacetylene_gs.cpp)
 target_link_libraries(polyacetylene_gs PRIVATE tapp_con)
+
+add_executable(constrained_vs_dense constrained_vs_dense.cpp)
+target_link_libraries(constrained_vs_dense PRIVATE tapp_con)
